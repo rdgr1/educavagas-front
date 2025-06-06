@@ -1,0 +1,26 @@
+.container{
+    button{
+        border: none;
+        background-color: var(--blue);
+        width: 150px;
+        height: 40px;
+        font-family: "Gotham";
+        font-weight: 600;
+        color: white;
+        font-size: 18px;
+        border-radius: 8px;
+
+        &:hover{
+        border: solid 2px var(--blue);
+        background-color: white;
+        width: 150px;
+        height: 40px;
+        font-family: "Gotham";
+        font-weight: 600;
+        color: var(--blue);
+        font-size: 18px;
+        border-radius: 8px;
+        transition: background 0.7s ease-in-out;
+        }
+    }
+}

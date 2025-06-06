@@ -1,0 +1,21 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    app-nav-bar {
+        width: 100%;
+    }
+    .content{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        padding: 30px 35px 0px 35px;
+        .hero-img{
+            img{
+                width: clamp(150px,45vw,700px);
+            }
+        }
+    }
+}

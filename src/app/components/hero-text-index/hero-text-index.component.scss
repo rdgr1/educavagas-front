@@ -1,0 +1,44 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    .texts{
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: self-start;
+        .h1 svg{
+            width: clamp(100px,45vw,650px);
+            height: 150px;
+        }
+        .h2 svg{
+            width: clamp(70px,23vw,350px);
+            height: 57px;
+        }
+        p{
+            font-weight: 100;
+            color: var(--black);
+            font-size: clamp(12px,10vw,26px);
+        }
+    }
+    .buttons{
+        display: flex;
+        flex-direction: row;
+        padding-top: 30px;
+        gap: 40px;
+        app-button-primary {
+            width: clamp(80px,15vw,205px);
+            height: 45px;
+            font-weight: 500;
+            font-size: 20px;
+        }
+        app-button-outlined{
+            width: clamp(80px,15vw,205px);
+            height: 45px;
+            font-weight: 500;
+            font-size: 20px;
+        }
+    }
+}
