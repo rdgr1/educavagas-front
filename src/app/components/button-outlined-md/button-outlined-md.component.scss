@@ -1,5 +1,6 @@
 .container{
     button{
+        cursor: pointer;
         border: solid 2px var(--blue);
         background-color: white;
         width: 205px;
@@ -9,5 +10,20 @@
         color: var(--blue);
         font-size: 20px;
         border-radius: 8px;
+        cursor: pointer;
+        &:hover{
+                butto{
+            border: none;
+            background-color: var(--blue);
+            width: 205px;
+            height: 45px;
+            font-family: "Gotham";
+            font-weight: 200 ;
+            color: white;
+            font-size: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        }
     }
 }

@@ -4,7 +4,7 @@ import { HeroTextIndexComponent } from "../../components/hero-text-index/hero-te
 
 @Component({
   selector: 'app-index',
-  imports: [NavBarComponent, HeroTextIndexComponent],
+  imports: [ HeroTextIndexComponent],
   templateUrl: './index.component.html',
   styleUrl: './index.component.scss'
 })

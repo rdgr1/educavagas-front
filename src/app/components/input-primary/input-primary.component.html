@@ -1,0 +1,16 @@
+<div class="form-input">
+  <label *ngIf="label" [attr.for]="label">{{ label }}<span *ngIf="required">*</span></label>
+  <input
+    [id]="label"
+    [type]="type"
+    [placeholder]="placeholder"
+    [formControl]="control"
+    [required]="required"
+    (blur)="touched()"
+    class="input-field"
+  />
+  <div class="error" *ngIf="control.invalid && (control.dirty || control.touched)">
+    <small *ngIf="control.hasError('required')">Campo obrigatório.</small>
+    <small *ngIf="control.hasError('email')">Formato de e-mail inválido.</small>
+  </div>
+</div>

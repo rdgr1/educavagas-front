@@ -9,7 +9,7 @@
         color: white;
         font-size: 18px;
         border-radius: 8px;
-
+        cursor: pointer;
         &:hover{
         border: solid 2px var(--blue);
         background-color: white;
@@ -21,6 +21,7 @@
         font-size: 18px;
         border-radius: 8px;
         transition: background 0.7s ease-in-out;
+        cursor: pointer;
         }
     }
 }
