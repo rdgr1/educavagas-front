@@ -1,0 +1,35 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    .title{
+        display: flex;
+        align-self: self-start;
+        justify-content: left;
+        padding: 15px 170px 0px 170px;
+    }
+    .texts{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        h1{
+            font-weight: 600;
+            color: var(--blue);
+            font-size: 26px;
+        }
+        .p{
+            font-size: 20px;
+            font-weight: 200;
+            .bold{
+            display: flex;
+            align-items: self-start;
+            justify-content: left;
+            font-weight: 600;
+            color: var(--blue);
+            }
+        }
+    }
+}

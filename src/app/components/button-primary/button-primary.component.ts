@@ -1,20 +1,23 @@
 import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-button-primary',
-  imports: [],
+  standalone: true,
+  imports: [CommonModule, RouterModule],
   templateUrl: './button-primary.component.html',
-  styleUrl: './button-primary.component.scss'
+  styleUrls: ['./button-primary.component.scss']
 })
 export class ButtonPrimaryComponent {
-constructor(private router: Router){}
-@Input() text: string = '';
-@Input() link: string = '';
+  @Input() text = '';
+  @Input() link = '';
 
-onNavigate(): void {
-      if(this.link) {
-          this.router.navigate([this.link]);
+  constructor(private router: Router) {}
+
+  onNavigate(): void {
+    if (this.link) {
+      this.router.navigateByUrl(this.link);
     }
   }
 }

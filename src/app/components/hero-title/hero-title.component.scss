@@ -1,0 +1,16 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 5px;
+    .bar{
+        background-color: var(--blue);
+        height: 26px;
+        width: 3px;
+    }
+    .title{
+        font-weight: 600;
+        color: var(--black);
+        font-size: 22px;
+    }
+}

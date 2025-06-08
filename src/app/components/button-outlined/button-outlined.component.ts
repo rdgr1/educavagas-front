@@ -1,20 +1,22 @@
 import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-button-outlined',
-  imports: [],
+  imports: [RouterModule,CommonModule],
   templateUrl: './button-outlined.component.html',
   styleUrl: './button-outlined.component.scss'
 })
 export class ButtonOutlinedComponent {
-constructor(private router: Router){}
-@Input() text: string = '';
-@Input() link: string = '';
+  @Input() text = '';
+  @Input() link = '';
 
-onNavigate(): void {
-      if(this.link) {
-          this.router.navigate([this.link]);
+  constructor(private router: Router) {}
+
+  onNavigate(): void {
+    if (this.link) {
+      this.router.navigateByUrl(this.link);
     }
   }
 }
