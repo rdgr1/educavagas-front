@@ -4,7 +4,6 @@
     align-items: center;
     padding-top: 30px;
     gap:45px;
-
     button{
         border: none;
         background-color: transparent;
@@ -12,6 +11,7 @@
         svg{
             width: 120px;
             height: 120px;
+            cursor: pointer;
         }
     }
 }
