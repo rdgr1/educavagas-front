@@ -5,24 +5,23 @@
         width: 205px;
         height: 45px;
         font-family: "Gotham";
-        font-weight: 200 ;
+        font-weight: 500;
         color: white;
         font-size: 20px;
         border-radius: 8px;
         cursor: pointer;
-    }
-    &:hover{
-    button{
+        &:hover{
         border: solid 2px var(--blue);
         background-color: white;
         width: 205px;
         height: 45px;
         font-family: "Gotham";
-        font-weight: 200;
+        font-weight: 500;
         color: var(--blue);
         font-size: 20px;
         border-radius: 8px;
+        transition: background 0.7s ease-in-out;
         cursor: pointer;
-    }
+        }
     }
 }

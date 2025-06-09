@@ -1,19 +1,30 @@
 // src/app/components/form-cadastro/form-cadastro.component.ts
-import { Component, OnInit } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  FormBuilder,
-  FormGroup,
-  FormControl,
-  Validators
-} from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { InputPrimaryComponent } from '../input-primary/input-primary.component';
-import { ButtonPrimaryMdComponent } from '../button-primary-md/button-primary-md.component';
-import { AuthService } from '../../services/auth.service';
-import { Router } from '@angular/router';
-import { ResponsavelDto } from '../../dto/responsavel.dto';
-import { UsuarioEscolaDto } from '../../dto/usuario-escola.dto';
+import { Component, OnInit }                    from '@angular/core';
+import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Router }                                from '@angular/router';
+import { CommonModule }                          from '@angular/common';
+import { ToastrService }                         from 'ngx-toastr';
+
+import { InputPrimaryComponent }                from '../input-primary/input-primary.component';
+import { ButtonPrimaryMdComponent }             from '../button-primary-md/button-primary-md.component';
+import { AuthService }                          from '../../services/auth.service';
+
+interface ResponsavelRequest {
+  nomeCompleto: string;
+  cpf: string;
+  email: string;
+  senha: string;
+  roles: string[];
+}
+
+interface EscolaRequest {
+  nomeCompleto: string;
+  cpf: string;
+  email: string;
+  senha: string;
+  roles: string[];
+  matricula: string;
+}
 
 @Component({
   selector: 'app-form-cadastro',
@@ -34,7 +45,8 @@ export class FormCadastroComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit() {
@@ -42,20 +54,22 @@ export class FormCadastroComponent implements OnInit {
       nome: ['', Validators.required],
       sobrenome: ['', Validators.required],
       dataNascimento: ['', Validators.required],
+      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       email: ['', [Validators.required, Validators.email]],
       senha: ['', [Validators.required, Validators.minLength(6)]],
       confirmarSenha: ['', Validators.required],
       role: ['RESPONSÁVEL'],
-      termos: [false, Validators.requiredTrue]
+      termos: [false, Validators.requiredTrue],
+      matricula: ['']
     }, {
       validators: this.senhasIguais('senha', 'confirmarSenha')
     });
   }
 
-  private senhasIguais(s: string, c: string) {
+  private senhasIguais(p: string, c: string) {
     return (g: FormGroup) => {
-      const pass = g.controls[s] as FormControl;
-      const confirm = g.controls[c] as FormControl;
+      const pass = g.get(p)!;
+      const confirm = g.get(c)!;
       confirm.setErrors(pass.value !== confirm.value ? { mismatch: true } : null);
     };
   }
@@ -65,48 +79,57 @@ export class FormCadastroComponent implements OnInit {
       this.form.markAllAsTouched();
       return;
     }
-
-    // monta objeto de acordo com a role
     const fv = this.form.value;
     const nomeCompleto = `${fv.nome} ${fv.sobrenome}`;
 
     if (fv.role === 'RESPONSÁVEL') {
-      const dto: ResponsavelDto = {
+      const dto: ResponsavelRequest = {
         nomeCompleto,
+        cpf: fv.cpf,
         email: fv.email,
         senha: fv.senha,
-        roles: [fv.role],
-        // cpf, telefone e endereco podem vir do formulário se você adicionar campos
+        roles: [fv.role]
       };
-
       this.auth.registerResponsavel(dto).subscribe({
-        next: () => this.router.navigate(['/login']),
-        error: err => alert('Erro no cadastro: ' + err.error?.message || err.message)
+        next: () => {
+          this.toastr.success('Responsável cadastrado com sucesso!');
+          this.router.navigate(['/login']);
+        },
+        error: err => {
+          this.toastr.error(err.error?.message || err.message, 'Erro no cadastro');
+        }
       });
 
-    } else { // USUARIO_ESCOLA
-      const dto: UsuarioEscolaDto = {
+    } else {
+      const dto: EscolaRequest = {
         nomeCompleto,
+        cpf: fv.cpf,
         email: fv.email,
         senha: fv.senha,
         roles: [fv.role],
-        // cpf, matricula, etc
+        matricula: fv.matricula
       };
-
       this.auth.registerEscola(dto).subscribe({
-        next: () => this.router.navigate(['/login']),
-        error: err => alert('Erro no cadastro: ' + err.error?.message || err.message)
+        next: () => {
+          this.toastr.success('Usuário escola cadastrado com sucesso!');
+          this.router.navigate(['/login']);
+        },
+        error: err => {
+          this.toastr.error(err.error?.message || err.message, 'Erro no cadastro');
+        }
       });
     }
   }
 
-  // Getters para o template
+  // Getters para template
   get nomeControl()           { return this.form.get('nome')! as FormControl; }
   get sobrenomeControl()      { return this.form.get('sobrenome')! as FormControl; }
   get dataNascimentoControl() { return this.form.get('dataNascimento')! as FormControl; }
+  get cpfControl()            { return this.form.get('cpf')! as FormControl; }
   get emailControl()          { return this.form.get('email')! as FormControl; }
   get senhaControl()          { return this.form.get('senha')! as FormControl; }
   get confirmarSenhaControl() { return this.form.get('confirmarSenha')! as FormControl; }
   get roleControl()           { return this.form.get('role')! as FormControl; }
   get termosControl()         { return this.form.get('termos')! as FormControl; }
+  get matriculaControl()      { return this.form.get('matricula')! as FormControl; }
 }

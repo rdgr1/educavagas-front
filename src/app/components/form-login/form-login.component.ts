@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit }       from '@angular/core';
+import { CommonModule }             from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   FormControl,
-  Validators,
+  Validators
 } from '@angular/forms';
+import { RouterModule, Router }     from '@angular/router';
+import { ToastrService }            from 'ngx-toastr';
 
-import { InputPrimaryComponent } from '../input-primary/input-primary.component';
+import { AuthService }              from '../../services/auth.service';
+import { InputPrimaryComponent }    from '../input-primary/input-primary.component';
 import { ButtonPrimaryMdComponent } from '../button-primary-md/button-primary-md.component';
-import { ButtonOutlinedMdComponent } from '../button-outlined-md/button-outlined-md.component';
+import { ButtonOutlinedMdComponent }from '../button-outlined-md/button-outlined-md.component';
 
 @Component({
   selector: 'app-form-login',
@@ -18,9 +21,10 @@ import { ButtonOutlinedMdComponent } from '../button-outlined-md/button-outlined
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    RouterModule,
     InputPrimaryComponent,
     ButtonPrimaryMdComponent,
-    ButtonOutlinedMdComponent,
+    ButtonOutlinedMdComponent
   ],
   templateUrl: './form-login.component.html',
   styleUrls: ['./form-login.component.scss'],
@@ -28,7 +32,6 @@ import { ButtonOutlinedMdComponent } from '../button-outlined-md/button-outlined
 export class FormLoginComponent implements OnInit {
   form!: FormGroup;
 
-  // _guardamos_ os controles em propriedades fortemente tipadas
   get emailControl(): FormControl {
     return this.form.get('email')! as FormControl;
   }
@@ -36,7 +39,12 @@ export class FormLoginComponent implements OnInit {
     return this.form.get('senha')! as FormControl;
   }
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router,
+    private toastr: ToastrService
+  ) {}
 
   ngOnInit() {
     this.form = this.fb.group({
@@ -52,7 +60,22 @@ export class FormLoginComponent implements OnInit {
     }
 
     const { email, senha } = this.form.value;
-    console.log('vou logar com', email, senha);
-    // chama seu AuthService.login({ email, senha })…
+    this.auth.login(email, senha).subscribe({
+      next: user => {
+        this.toastr.success(`Bem-vindo de volta, ${user.nomeCompleto}!`);
+        // redireciona pro dashboard conforme perfil
+        if (user.roles.includes('USUARIO_ESCOLA')) {
+          this.router.navigate(['/dashboard-escola']);
+        } else {
+          this.router.navigate(['/dashboard-usuario']);
+        }
+      },
+      error: err => {
+        this.toastr.error(
+          err.error?.message ?? 'Usuário ou senha inválidos',
+          'Falha no login'
+        );
+      }
+    });
   }
 }

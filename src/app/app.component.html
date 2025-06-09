@@ -1,4 +1,7 @@
-<div class="container">
-    <app-nav-bar></app-nav-bar>
-    <router-outlet/>
-</div>
+<app-nav-bar *ngIf="!(user$ | async)"></app-nav-bar>
+
+<app-nav-bar-logged *ngIf="user$ | async as user"></app-nav-bar-logged>
+
+<main class="app-content">
+  <router-outlet></router-outlet>
+</main>

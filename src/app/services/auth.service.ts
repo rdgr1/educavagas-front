@@ -1,88 +1,91 @@
 // src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { Router } from '@angular/router';
-
+import { HttpClient } from '@angular/common/http';
+import {
+  BehaviorSubject,
+  Observable,
+  catchError,
+  of,
+  tap,
+  throwError
+} from 'rxjs';
 import { UsuarioDto } from '../dto/usuario.dto';
 import { ResponsavelDto } from '../dto/responsavel.dto';
 import { UsuarioEscolaDto } from '../dto/usuario-escola.dto';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  // armazena o usuário logado
-  private usuarioSubject = new BehaviorSubject<UsuarioDto | null>(null);
-  public usuario$ = this.usuarioSubject.asObservable();
+  private apiBase = '/autenticacao';
+  private userSubject = new BehaviorSubject<UsuarioDto | null>(null);
+  public usuario$ = this.userSubject.asObservable();
 
-  // header Basic em memória
-  private authHeader: string | null = null;
+  constructor(private http: HttpClient) {}
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {}
-
-  /** Deve ser chamado uma vez, ao iniciar a app, para restaurar credenciais */
+  /** Deve ser chamado no startup (ex: AppComponent) */
   init(): void {
-    const stored = localStorage.getItem('auth');
-    if (!stored) return;
+    // se não estivermos num browser (ex: SSR), aborta
+    if (typeof window === 'undefined' || !('localStorage' in window)) {
+      this.userSubject.next(null);
+      return;
+    }
 
-    this.authHeader = stored;
-    const headers = new HttpHeaders().set('Authorization', stored);
-    this.http.get<UsuarioDto>('/autenticacao/usuario', { headers })
-      .subscribe({
-        next: user => this.usuarioSubject.next(user),
-        error: () => this.logout()
-      });
+    const auth = window.localStorage.getItem('auth');
+    if (!auth) {
+      this.userSubject.next(null);
+      return;
+    }
+
+    // tenta buscar o usuário corrente
+    this.http.get<UsuarioDto>(`${this.apiBase}/usuario`)
+      .pipe(
+        tap(user => this.userSubject.next(user)),
+        catchError(_ => {
+          // token inválido ou expirou
+          this.logout();
+          return of(null);
+        })
+      )
+      .subscribe();
   }
 
-  /** Faz login via Basic Auth e carrega o usuário */
-  login(email: string, senha: string): Observable<UsuarioDto> {
-    this.authHeader = 'Basic ' + btoa(`${email}:${senha}`);
-    const headers = new HttpHeaders().set('Authorization', this.authHeader);
-    return this.http.get<UsuarioDto>('/autenticacao/usuario', { headers }).pipe(
-      tap(user => {
-        this.usuarioSubject.next(user);
-        localStorage.setItem('auth', this.authHeader!);
-      })
-    );
-  }
-
-  /** Desloga limpando estado e redireciona ao login */
-  logout(): void {
-    this.authHeader = null;
-    this.usuarioSubject.next(null);
-    localStorage.removeItem('auth');
-    this.router.navigate(['/login']);
-  }
-
-  /** Indica se já há um usuário carregado */
-  isLoggedIn(): boolean {
-    return this.usuarioSubject.value != null;
-  }
-
-  /** Registro de Responsável */
+  /** Cadastra novo Responsável */
   registerResponsavel(dto: ResponsavelDto): Observable<ResponsavelDto> {
     return this.http.post<ResponsavelDto>(
-      '/autenticacao/cadastro/responsavel',
-      dto
+      `${this.apiBase}/cadastro/responsavel`, dto
     );
   }
 
-  /** Registro de Usuário da Escola */
+  /** Cadastra novo Usuário-Escola */
   registerEscola(dto: UsuarioEscolaDto): Observable<UsuarioEscolaDto> {
     return this.http.post<UsuarioEscolaDto>(
-      '/autenticacao/cadastro/escola',
-      dto
+      `${this.apiBase}/cadastro/escola`, dto
     );
   }
 
-  /** Fetch “quem sou eu?” */
-  obterUsuarioLogado(): Observable<UsuarioDto> {
-    // se quiser forçar a usar o header em memória:
-    const headers = this.authHeader
-      ? new HttpHeaders().set('Authorization', this.authHeader)
-      : undefined;
-    return this.http.get<UsuarioDto>('/autenticacao/usuario', { headers });
+  /** Login com BasicAuth: armazena header e carrega usuário */
+  login(email: string, senha: string): Observable<UsuarioDto> {
+    const token = btoa(`${email}:${senha}`);
+    const headerValue = `Basic ${token}`;
+    // salva o header completo em localStorage
+    if (typeof window !== 'undefined' && 'localStorage' in window) {
+      window.localStorage.setItem('auth', headerValue);
+    }
+
+    return this.http.get<UsuarioDto>(`${this.apiBase}/usuario`)
+      .pipe(
+        tap(user => this.userSubject.next(user)),
+        catchError(err => {
+          // se deu erro, limpa tudo
+          this.logout();
+          return throwError(() => err);
+        })
+      );
+  }
+
+  logout(): void {
+    if (typeof window !== 'undefined' && 'localStorage' in window) {
+      window.localStorage.removeItem('auth');
+    }
+    this.userSubject.next(null);
   }
 }

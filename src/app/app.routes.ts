@@ -1,45 +1,29 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-
-import { IndexComponent }     from './pages/index/index.component';
-import { InfoComponent }      from './pages/info/info.component';
-import { LoginComponent }     from './pages/login/login.component';
-import { CadastroComponent }  from './pages/cadastro/cadastro.component';
-//import { DashboardComponent } from './pages/dashboard/dashboard.component';
-
-import { AuthGuard }          from './guards/auth.guard';
+// src/app/app.routes.ts
+import { Routes }              from '@angular/router';
+import { IndexComponent }      from './pages/index/index.component';
+import { InfoComponent }       from './pages/info/info.component';
+import { LoginComponent }      from './pages/login/login.component';
+import { CadastroComponent }   from './pages/cadastro/cadastro.component';
+import { AuthGuard }           from './guards/auth.guard';
+import { DashboardUsuarioComponent } from './pages/dashboard-usuario/dashboard-usuario.component';
+import { DashboardUsuarioEscolaComponent } from './pages/dashboard-usuario-escola/dashboard-usuario-escola.component';
 
 export const routes: Routes = [
-  { path: '',           redirectTo: 'index', pathMatch: 'full' },
-  { path: 'index',      component: IndexComponent },
-  { path: 'info',       component: InfoComponent },
-  { path: 'login',      component: LoginComponent },
-  { path: 'cadastro',   component: CadastroComponent },
-  // área protegida do sistema  
-  //{ 
-    //path: 'dashboard',  
-    //component: DashboardComponent,
-    //canActivate: [AuthGuard] 
-  //},
+  { path: '',            redirectTo: 'index', pathMatch: 'full' },
+  { path: 'index',       component: IndexComponent },
+  { path: 'info',        component: InfoComponent },
+  { path: 'login',       component: LoginComponent },
+  { path: 'cadastro',    component: CadastroComponent },
 
-  // se quiser duas áreas separadas:
-  // {
-  //   path: 'dashboard-responsavel',
-  //   component: DashboardResponsavelComponent,
-  //   canActivate: [AuthGuard]
-  // },
-  // {
-  //   path: 'dashboard-escola',
-  //   component: DashboardEscolaComponent,
-  //   canActivate: [AuthGuard]
-  // },
-
-  // rota “coringa” para 404  
+{
+  path: 'dashboard-usuario',
+  component: DashboardUsuarioComponent,
+  /*canActivate: [ AuthGuard ]*/
+},
+{
+  path: 'dashboard-usuario-escola',
+  component: DashboardUsuarioEscolaComponent,
+  /*canActivate: [ AuthGuard ]*/
+},
   { path: '**', redirectTo: 'index' }
 ];
-
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule {}

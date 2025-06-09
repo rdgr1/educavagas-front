@@ -1,4 +1,4 @@
-// src/app/interceptors/auth.interceptor.ts
+// src/app/guards/auth.interceptor.ts
 import { Injectable } from '@angular/core';
 import {
   HttpInterceptor,
@@ -15,8 +15,9 @@ export class AuthInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     const auth = localStorage.getItem('auth');
-    if (!auth) return next.handle(req);
-
+    if (!auth) {
+      return next.handle(req);
+    }
     const clone = req.clone({
       setHeaders: { Authorization: auth }
     });

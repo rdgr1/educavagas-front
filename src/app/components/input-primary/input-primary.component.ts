@@ -31,7 +31,7 @@ export class InputPrimaryComponent implements ControlValueAccessor{
 @Input() label: string = '';
 @Input() placeholder: string = '';
 @Input() type: 'text' | 'email' | 'password' = 'text';
-@Input() required =  false;
+@Input() required: boolean =  false;
 @Input() control: FormControl = new FormControl('');
 
   private onChange: (value: any) => void = () => {};

@@ -1,11 +1,8 @@
 // src/app/guards/auth.guard.ts
 import { Injectable } from '@angular/core';
 import {
-  CanActivate,
-  Router,
-  UrlTree,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot
+  CanActivate, Router, UrlTree,
+  ActivatedRouteSnapshot, RouterStateSnapshot
 } from '@angular/router';
 import { Observable, map, take } from 'rxjs';
 import { AuthService } from '../services/auth.service';
@@ -17,7 +14,6 @@ export class AuthGuard implements CanActivate {
     private auth: AuthService,
     private router: Router
   ) {
-    // já dispara a restauração do usuário, se houver credenciais em localStorage
     this.auth.init();
   }
 
@@ -26,14 +22,9 @@ export class AuthGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Observable<boolean | UrlTree> {
     return this.auth.usuario$.pipe(
-      // só pega o primeiro valor e completa
       take(1),
       map(user => {
-        if (user) {
-          // já está logado, libera a rota
-          return true;
-        }
-        // não está logado: redireciona para /login
+        if (user) return true;
         return this.router.createUrlTree(['/login'], {
           queryParams: { returnUrl: state.url }
         });
