@@ -1,19 +1,72 @@
-
 <div class="registration">
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
-    <app-input-primary label="Nome" placeholder="Insira seu nome" [control]="nomeControl" ></app-input-primary>
-    <app-input-primary label="Sobrenome" placeholder="Insira seu sobrenome" [control]="sobrenomeControl" ></app-input-primary>
-    <app-input-primary label="Data de nascimento" placeholder="dd/mm/aaaa" type="text" [control]="dataNascimentoControl" ></app-input-primary>
-    <app-input-primary label="CPF" placeholder="Somente dígitos" [control]="cpfControl" ></app-input-primary>
-    <app-input-primary label="Email" placeholder="Insira seu email" type="email" [control]="emailControl" ></app-input-primary>
-    <app-input-primary label="Senha" placeholder="Insira sua senha" type="password" [control]="senhaControl" ></app-input-primary>
-    <app-input-primary label="Confirmar Senha" placeholder="Repita sua senha" type="password" [control]="confirmarSenhaControl" ></app-input-primary>
+
+    <app-input-primary
+      label="Nome"
+      placeholder="Insira seu nome"
+      [control]="nomeControl">
+    </app-input-primary>
+
+    <app-input-primary
+      label="Sobrenome"
+      placeholder="Insira seu sobrenome"
+      [control]="sobrenomeControl">
+    </app-input-primary>
+
+    <app-input-primary
+      label="Data de nascimento"
+      placeholder="dd/MM/aaaa"
+      type="text"
+      [control]="dataNascimentoControl">
+    </app-input-primary>
+
+    <app-input-primary
+      label="CPF"
+      placeholder="Somente dígitos"
+      [control]="cpfControl">
+    </app-input-primary>
+
+    <app-input-primary
+      label="Email"
+      placeholder="Insira seu email"
+      type="email"
+      [control]="emailControl">
+    </app-input-primary>
+
+    <app-input-primary
+      *ngIf="roleControl.value==='RESPONSÁVEL'"
+      label="Endereço"
+      placeholder="Rua, número, bairro"
+      [control]="enderecoControl">
+    </app-input-primary>
+
+    <app-input-primary
+      *ngIf="roleControl.value==='RESPONSÁVEL'"
+      label="Telefone"
+      placeholder="(99) 99999-9999"
+      [control]="telefoneControl">
+    </app-input-primary>
+
+    <app-input-primary
+      label="Senha"
+      placeholder="Insira sua senha"
+      type="password"
+      [control]="senhaControl">
+    </app-input-primary>
+
+    <app-input-primary
+      label="Confirmar Senha"
+      placeholder="Repita sua senha"
+      type="password"
+      [control]="confirmarSenhaControl">
+    </app-input-primary>
 
     <div class="role-group">
       <label *ngFor="let r of roles">
-        <input type="radio" formControlName="role" [value]="r" /> {{ r === 'RESPONSÁVEL' ? 'Responsável/Aluno' : 'Funcionário/Professor' }}
+        <input type="radio" formControlName="role" [value]="r" />
+        {{ r==='RESPONSÁVEL' ? 'Responsável/Aluno' : 'Funcionário/Professor' }}
       </label>
-      <small *ngIf="roleControl.value === 'USUARIO_ESCOLA'">
+      <small *ngIf="roleControl.value==='USUARIO_ESCOLA'">
         Essa modalidade exige aprovação da equipe.
       </small>
     </div>
@@ -28,5 +81,6 @@
       type="submit"
       [disabled]="form.invalid">
     </app-button-primary-md>
+
   </form>
 </div>

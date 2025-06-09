@@ -1,0 +1,17 @@
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 30px;
+    gap:45px;
+
+    button{
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+        svg{
+            width: 120px;
+            height: 120px;
+        }
+    }
+}

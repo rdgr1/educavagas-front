@@ -1,30 +1,19 @@
-// src/app/components/form-cadastro/form-cadastro.component.ts
-import { Component, OnInit }                    from '@angular/core';
-import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router }                                from '@angular/router';
-import { CommonModule }                          from '@angular/common';
-import { ToastrService }                         from 'ngx-toastr';
+import { Component, OnInit }    from '@angular/core';
+import { CommonModule }          from '@angular/common';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  FormControl,
+  Validators
+} from '@angular/forms';
+import { Router }                from '@angular/router';
+import { ToastrService }         from 'ngx-toastr';
 
-import { InputPrimaryComponent }                from '../input-primary/input-primary.component';
-import { ButtonPrimaryMdComponent }             from '../button-primary-md/button-primary-md.component';
-import { AuthService }                          from '../../services/auth.service';
-
-interface ResponsavelRequest {
-  nomeCompleto: string;
-  cpf: string;
-  email: string;
-  senha: string;
-  roles: string[];
-}
-
-interface EscolaRequest {
-  nomeCompleto: string;
-  cpf: string;
-  email: string;
-  senha: string;
-  roles: string[];
-  matricula: string;
-}
+import { InputPrimaryComponent }   from '../input-primary/input-primary.component';
+import { ButtonPrimaryMdComponent }from '../button-primary-md/button-primary-md.component';
+import { AuthService }             from '../../services/auth.service';
+import { ResponsavelRequest, EscolaRequest } from '../../dto/usuario.dto';
 
 @Component({
   selector: 'app-form-cadastro',
@@ -51,26 +40,43 @@ export class FormCadastroComponent implements OnInit {
 
   ngOnInit() {
     this.form = this.fb.group({
-      nome: ['', Validators.required],
-      sobrenome: ['', Validators.required],
-      dataNascimento: ['', Validators.required],
-      cpf: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
-      email: ['', [Validators.required, Validators.email]],
-      senha: ['', [Validators.required, Validators.minLength(6)]],
-      confirmarSenha: ['', Validators.required],
-      role: ['RESPONSÁVEL'],
-      termos: [false, Validators.requiredTrue],
-      matricula: ['']
+      nome:            ['', Validators.required],
+      sobrenome:       ['', Validators.required],
+      dataNascimento:  ['', Validators.required],
+      cpf:             ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
+      email:           ['', [Validators.required, Validators.email]],
+      senha:           ['', [Validators.required, Validators.minLength(6)]],
+      confirmarSenha:  ['', Validators.required],
+      endereco:        [''],
+      telefone:        [''],
+      role:            ['RESPONSÁVEL'],
+      termos:          [false, Validators.requiredTrue],
+      matricula:       ['']
     }, {
-      validators: this.senhasIguais('senha', 'confirmarSenha')
+      validators: this.senhasIguais('senha','confirmarSenha')
+    });
+
+    // ajusta required de endereco/telefone conforme role
+    this.roleControl.valueChanges.subscribe(role => {
+      const end = this.enderecoControl;
+      const tel = this.telefoneControl;
+      if (role === 'RESPONSÁVEL') {
+        end.setValidators([Validators.required]);
+        tel.setValidators([Validators.required]);
+      } else {
+        end.clearValidators();
+        tel.clearValidators();
+      }
+      end.updateValueAndValidity();
+      tel.updateValueAndValidity();
     });
   }
 
-  private senhasIguais(p: string, c: string) {
+  private senhasIguais(p:string, c:string) {
     return (g: FormGroup) => {
-      const pass = g.get(p)!;
+      const pass    = g.get(p)!;
       const confirm = g.get(c)!;
-      confirm.setErrors(pass.value !== confirm.value ? { mismatch: true } : null);
+      confirm.setErrors(pass.value!==confirm.value ? { mismatch:true } : null);
     };
   }
 
@@ -82,13 +88,15 @@ export class FormCadastroComponent implements OnInit {
     const fv = this.form.value;
     const nomeCompleto = `${fv.nome} ${fv.sobrenome}`;
 
-    if (fv.role === 'RESPONSÁVEL') {
+    if (fv.role==='RESPONSÁVEL') {
       const dto: ResponsavelRequest = {
         nomeCompleto,
-        cpf: fv.cpf,
-        email: fv.email,
-        senha: fv.senha,
-        roles: [fv.role]
+        cpf:      fv.cpf,
+        email:    fv.email,
+        senha:    fv.senha,
+        endereco: fv.endereco,
+        telefone: fv.telefone,
+        roles:    [fv.role]
       };
       this.auth.registerResponsavel(dto).subscribe({
         next: () => {
@@ -96,18 +104,18 @@ export class FormCadastroComponent implements OnInit {
           this.router.navigate(['/login']);
         },
         error: err => {
-          this.toastr.error(err.error?.message || err.message, 'Erro no cadastro');
+          this.toastr.error(err.error?.message||err.message,'Erro no cadastro');
         }
       });
 
     } else {
       const dto: EscolaRequest = {
         nomeCompleto,
-        cpf: fv.cpf,
-        email: fv.email,
-        senha: fv.senha,
-        roles: [fv.role],
-        matricula: fv.matricula
+        cpf:      fv.cpf,
+        email:    fv.email,
+        senha:    fv.senha,
+        roles:    [fv.role],
+        matricula:fv.matricula
       };
       this.auth.registerEscola(dto).subscribe({
         next: () => {
@@ -115,21 +123,23 @@ export class FormCadastroComponent implements OnInit {
           this.router.navigate(['/login']);
         },
         error: err => {
-          this.toastr.error(err.error?.message || err.message, 'Erro no cadastro');
+          this.toastr.error(err.error?.message||err.message,'Erro no cadastro');
         }
       });
     }
   }
 
-  // Getters para template
-  get nomeControl()           { return this.form.get('nome')! as FormControl; }
-  get sobrenomeControl()      { return this.form.get('sobrenome')! as FormControl; }
-  get dataNascimentoControl() { return this.form.get('dataNascimento')! as FormControl; }
-  get cpfControl()            { return this.form.get('cpf')! as FormControl; }
-  get emailControl()          { return this.form.get('email')! as FormControl; }
-  get senhaControl()          { return this.form.get('senha')! as FormControl; }
-  get confirmarSenhaControl() { return this.form.get('confirmarSenha')! as FormControl; }
-  get roleControl()           { return this.form.get('role')! as FormControl; }
-  get termosControl()         { return this.form.get('termos')! as FormControl; }
-  get matriculaControl()      { return this.form.get('matricula')! as FormControl; }
+  // getters para o template
+  get nomeControl()          { return this.form.get('nome')! as FormControl; }
+  get sobrenomeControl()     { return this.form.get('sobrenome')! as FormControl; }
+  get dataNascimentoControl(){ return this.form.get('dataNascimento')! as FormControl; }
+  get cpfControl()           { return this.form.get('cpf')! as FormControl; }
+  get emailControl()         { return this.form.get('email')! as FormControl; }
+  get senhaControl()         { return this.form.get('senha')! as FormControl; }
+  get confirmarSenhaControl(){ return this.form.get('confirmarSenha')! as FormControl; }
+  get enderecoControl()      { return this.form.get('endereco')! as FormControl; }
+  get telefoneControl()      { return this.form.get('telefone')! as FormControl; }
+  get roleControl()          { return this.form.get('role')! as FormControl; }
+  get termosControl()        { return this.form.get('termos')! as FormControl; }
+  get matriculaControl()     { return this.form.get('matricula')! as FormControl; }
 }

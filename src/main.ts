@@ -1,43 +1,43 @@
-// src/main.ts
-import { bootstrapApplication }             from '@angular/platform-browser';
-import { importProvidersFrom }              from '@angular/core';
-import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi, withFetch } 
-                                            from '@angular/common/http';
-import { provideRouter }                    from '@angular/router';
-import { provideAnimations }                from '@angular/platform-browser/animations';
+// main.ts
+import { bootstrapApplication }     from '@angular/platform-browser';
+import { importProvidersFrom }      from '@angular/core';
+import { provideRouter }            from '@angular/router';
+import { provideHttpClient, 
+         withInterceptorsFromDi, 
+         withFetch, 
+         HTTP_INTERCEPTORS }       from '@angular/common/http';
+import { provideAnimations }        from '@angular/platform-browser/animations'; // ← aqui
+import { ToastrModule }             from 'ngx-toastr';
 
-import { BrowserAnimationsModule }          from '@angular/platform-browser/animations';
-import { ToastrModule }                     from 'ngx-toastr';
-
-import { AppComponent }                     from './app/app.component';
-import { routes }                           from './app/app.routes';
-import { AuthInterceptor }                  from './app/guards/auth.interceptor';
-import { AuthGuard }                        from './app/guards/auth.guard';
+import { AppComponent }             from './app/app.component';
+import { routes }                   from './app/app.routes';
+import { AuthInterceptor }          from './app/guards/auth.interceptor';
+import { XhrInterceptor } from './app/guards/xhr.interceptor';
 
 bootstrapApplication(AppComponent, {
   providers: [
-    // 1) Módulo de animações + ToastrModule.forRoot() → carrega o ToastConfig
-    importProvidersFrom(
-      BrowserAnimationsModule,
-      ToastrModule.forRoot({
-        positionClass: 'toast-top-right',
-        preventDuplicates: true,
-        // qualquer outra config padrão do Toastr...
-      })
-    ),
-
-    // 2) Interceptor de autenticação
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-
-    // 3) HttpClient com fetch() e interceptors via DI
+    provideAnimations(),                           
     provideHttpClient(
       withInterceptorsFromDi(),
       withFetch()
     ),
 
-    // 4) Roteamento e guardas
+    // 2) Toastr
+    importProvidersFrom(
+      ToastrModule.forRoot({
+        positionClass: 'toast-bottom-right',
+        timeOut: 3000,
+        closeButton: true,
+        progressBar: true,
+        progressAnimation: 'decreasing',
+        preventDuplicates: true,
+        newestOnTop: true,
+      })
+    ),
+     { provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true },
+    // 3) roteador e interceptor de auth
     provideRouter(routes),
-    provideAnimations(),
-    AuthGuard
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
   ]
-}).catch(err => console.error(err));
+})
+.catch(err => console.error(err));

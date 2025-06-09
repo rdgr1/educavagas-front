@@ -20,20 +20,26 @@ import { UsuarioDto }             from './dto/usuario.dto';
     NavBarComponent,
     NavBarLoggedComponent
   ],
-  templateUrl: './app.component.html',
+    template: `
+    <ng-container *ngIf="(auth.usuario$ | async) as user; else anonNav">
+      <app-nav-bar-logged></app-nav-bar-logged>
+    </ng-container>
+    <ng-template #anonNav>
+      <app-nav-bar></app-nav-bar>
+    </ng-template>
+
+    <router-outlet></router-outlet>`,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   constructor(
-    private auth: AuthService,
+    public auth: AuthService,
     @Inject(PLATFORM_ID) private platformId: any
   ) {
     if (isPlatformBrowser(this.platformId)) {
       this.auth.init();
     }
   }
-
-  /** Getter que expõe a Observable de usuário */
   get user$(): Observable<UsuarioDto | null> {
     return this.auth.usuario$;
   }

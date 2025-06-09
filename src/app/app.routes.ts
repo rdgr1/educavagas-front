@@ -18,12 +18,14 @@ export const routes: Routes = [
 {
   path: 'dashboard-usuario',
   component: DashboardUsuarioComponent,
-  /*canActivate: [ AuthGuard ]*/
+  canActivate: [ AuthGuard ],
+  data: { roles: ['RESPONSAVEL', 'ADMIN'] }
 },
 {
   path: 'dashboard-usuario-escola',
   component: DashboardUsuarioEscolaComponent,
-  /*canActivate: [ AuthGuard ]*/
+  canActivate: [ AuthGuard ],
+  data: { roles: ['ESCOLA'] }
 },
   { path: '**', redirectTo: 'index' }
 ];

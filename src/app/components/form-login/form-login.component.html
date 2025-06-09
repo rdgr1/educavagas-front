@@ -1,31 +1,20 @@
 <div class="container">
   <div class="form">
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
-      <app-input-primary
-        label="Email"
-        placeholder="Digite seu email"
-        type="email"
-        [required]="true"
-        [control]="emailControl"
-      ></app-input-primary>
+      <app-input-primary label="Email" placeholder="Digite seu email" type="email" [required]="true"
+        [control]="emailControl"></app-input-primary>
 
-      <app-input-primary
-        label="Senha"
-        placeholder="Digite sua senha"
-        type="password"
-        [required]="true"
-        [control]="senhaControl"
-      ></app-input-primary>
+      <app-input-primary label="Senha" placeholder="Digite sua senha" type="password" [required]="true"
+        [control]="senhaControl"></app-input-primary>
 
       <div class="link">
         <a routerLink="/esqueci-senha">Esqueci a senha...</a>
       </div>
-
-      <app-button-primary-md
-        text="Entrar"
-        type="submit"
-        [disabled]="form.invalid"
-      ></app-button-primary-md>
+    <app-button-primary-md
+    text="Entrar"
+    type="submit"
+    [disabled]="form.invalid"
+  ></app-button-primary-md>
     </form>
   </div>
 
@@ -35,8 +24,7 @@
 
   <div class="texts">
     <p class="first">Não tem conta?</p>
-    <!-- aqui vamos usar routerLink puro -->
-    <p><a routerLink="/cadastro">Cadastra-se</a></p>
+    <p>Cadastra-se</p>
   </div>
 
   <app-button-outlined-md text="Cadastro" link="cadastro"></app-button-outlined-md>

@@ -1,19 +1,19 @@
-import { Component, OnInit }       from '@angular/core';
-import { CommonModule }             from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
   FormGroup,
   FormControl,
-  Validators
+  Validators,
 } from '@angular/forms';
-import { RouterModule, Router }     from '@angular/router';
-import { ToastrService }            from 'ngx-toastr';
+import { RouterModule, Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 
-import { AuthService }              from '../../services/auth.service';
-import { InputPrimaryComponent }    from '../input-primary/input-primary.component';
+import { AuthService } from '../../services/auth.service';
+import { InputPrimaryComponent } from '../input-primary/input-primary.component';
 import { ButtonPrimaryMdComponent } from '../button-primary-md/button-primary-md.component';
-import { ButtonOutlinedMdComponent }from '../button-outlined-md/button-outlined-md.component';
+import { ButtonOutlinedMdComponent } from '../button-outlined-md/button-outlined-md.component';
 
 @Component({
   selector: 'app-form-login',
@@ -24,20 +24,13 @@ import { ButtonOutlinedMdComponent }from '../button-outlined-md/button-outlined-
     RouterModule,
     InputPrimaryComponent,
     ButtonPrimaryMdComponent,
-    ButtonOutlinedMdComponent
+    ButtonOutlinedMdComponent,
   ],
   templateUrl: './form-login.component.html',
   styleUrls: ['./form-login.component.scss'],
 })
 export class FormLoginComponent implements OnInit {
   form!: FormGroup;
-
-  get emailControl(): FormControl {
-    return this.form.get('email')! as FormControl;
-  }
-  get senhaControl(): FormControl {
-    return this.form.get('senha')! as FormControl;
-  }
 
   constructor(
     private fb: FormBuilder,
@@ -53,6 +46,13 @@ export class FormLoginComponent implements OnInit {
     });
   }
 
+  get emailControl() {
+    return this.form.get('email')! as FormControl;
+  }
+  get senhaControl() {
+    return this.form.get('senha')! as FormControl;
+  }
+
   onSubmit() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
@@ -60,22 +60,22 @@ export class FormLoginComponent implements OnInit {
     }
 
     const { email, senha } = this.form.value;
+
     this.auth.login(email, senha).subscribe({
-      next: user => {
-        this.toastr.success(`Bem-vindo de volta, ${user.nomeCompleto}!`);
-        // redireciona pro dashboard conforme perfil
-        if (user.roles.includes('USUARIO_ESCOLA')) {
+      next: (user) => {
+        this.toastr.success('Bem-vindo de volta!', 'Login realizado');
+        console.log('UsuarioDto retornado:', user);
+        console.log('Tipo exato:', JSON.stringify(user.tipo));
+        // redireciona conforme o tipo de usuário
+        if (user.tipo === 'ESCOLA') {
           this.router.navigate(['/dashboard-escola']);
         } else {
           this.router.navigate(['/dashboard-usuario']);
         }
       },
-      error: err => {
-        this.toastr.error(
-          err.error?.message ?? 'Usuário ou senha inválidos',
-          'Falha no login'
-        );
-      }
+      error: (err) => {
+        this.toastr.error(err.error?.message || err.message, 'Falha no login');
+      },
     });
   }
 }
